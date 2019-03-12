@@ -6,6 +6,7 @@ use reqwest::Client;
 use reqwest::r#async as async_reqwest;
 use reqwest::header::{HeaderMap, DATE};
 use futures::{Future, Stream};
+use futures3::compat::Compat01As03;
 pub use reqwest::r#async::Chunk;
 
 use failure::Error;
@@ -191,6 +192,19 @@ impl<'a> OSS<'a> {
                 body.concat2()
             })
             .map_err(|err| err.into())
+    }
+
+    pub async fn async_get_object_f3 (
+        &'a self,
+        object: &'a str,
+        headers: Option<HashMap<&'a str, &'a str>>,
+        resources: Option<HashMap<String, Option<String>>>,
+    ) -> Chunk {
+        let chunk = await!(Compat01As03::new(
+            self.async_get_object(object, headers, resources)
+        ))
+        .unwrap_or_default();
+        chunk
     }
 
     pub fn async_put_object_from_buffer(

@@ -1,3 +1,5 @@
+#![feature(await_macro, async_await, futures_api)]
+
 #[macro_use]
 extern crate failure;
 #[macro_use]
